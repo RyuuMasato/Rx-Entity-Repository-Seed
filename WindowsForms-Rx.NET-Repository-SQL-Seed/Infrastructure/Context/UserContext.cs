@@ -1,0 +1,34 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using RxRepoSeed.Model;
+using System.Data.Entity;
+
+namespace RxRepoSeed.Infrastructure.Context
+{
+    class UserContext : DbContext
+    {
+        public UserContext() : base() { }
+
+        public DbSet<User> Users { get; set; }
+
+        protected override void OnModelCreating(DbModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<User>().Map(m =>
+            {
+                m.Properties(p => new { p.UserID, p.Username });
+                m.ToTable("Users");
+            });
+
+            modelBuilder.Entity<User>().HasKey<int>(u => u.UserID);
+
+            modelBuilder.Entity<User>()
+                .Property(p => p.Username)
+                .IsConcurrencyToken()
+                .HasMaxLength(25)
+                .IsRequired();
+        }
+    }
+}
